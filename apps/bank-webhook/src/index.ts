@@ -1,6 +1,8 @@
 import express from "express";
 import db from "@repo/db/client";
 import zod from "zod";
+import { ApiError } from "../../../utils/ApiError";
+import { ApiResponse } from "../../../utils/ApiResponse";
 const app = express();
 
 app.use(express.json());
@@ -15,9 +17,15 @@ app.post("/hdfcWebhook", async (req, res) => {
   const body = req.body;
   const { success, data } = paymentBody.safeParse(body);
   if (!success) {
-    return res.status(411).json({
-      message: "invalid data format",
-    });
+    throw new ApiError(411, "UnAuthorized Accesss");
+  }
+  const onRampData = await db.onRampTransaction.findUnique({
+    where: {
+      token: data.token,
+    },
+  });
+  if (onRampData?.status === "Success") {
+    throw new ApiError(400, "Transaction already completed");
   }
   try {
     await db.$transaction([
@@ -42,14 +50,10 @@ app.post("/hdfcWebhook", async (req, res) => {
       }),
     ]);
 
-    res.json({
-      message: "Captured",
-    });
+    res.status(200).json(new ApiResponse(200, data, "transaction processed"));
   } catch (e) {
     console.error(e);
-    res.status(411).json({
-      message: "Error while processing webhook",
-    });
+    throw new ApiError(411, "error processing payment");
   }
 });
 
