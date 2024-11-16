@@ -20,6 +20,8 @@ const p2pTransfer = async (to: string, amount: number) => {
     throw new ApiError(400, "Recipient doesn't exists");
   }
   await prisma.$transaction(async (tx) => {
+    // locks the row for current transaction, allow multiple txns sequentially
+    await tx.$queryRaw`SELECT * FROM "Balance" WHERE "userId" = ${Number(from)} FOR UPDATE`;
     const senderBal = await tx.balance.findUnique({
       where: {
         userId: Number(from),
@@ -46,6 +48,14 @@ const p2pTransfer = async (to: string, amount: number) => {
         amount: {
           increment: amount * 100,
         },
+      },
+    });
+    await tx.p2pTransfer.create({
+      data: {
+        amount: amount * 100,
+        timestamp: new Date(),
+        fromUserId: Number(from),
+        toUserId: recipient.id,
       },
     });
   });
