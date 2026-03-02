@@ -5,4 +5,3 @@ export default defineConfig({
     url: process.env.DATABASE_URL,
   },
 });
-console.log("cicd checking after prisma update");
