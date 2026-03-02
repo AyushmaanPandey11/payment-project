@@ -1,16 +1,23 @@
-import { NextResponse } from "next/server"
-import { PrismaClient } from "@repo/db/client";
+import { NextResponse } from "next/server";
+import db from "@repo/db/client";
 
-const client = new PrismaClient();
+export const dynamic = "force-dynamic";
 
 export const GET = async () => {
-    await client.user.create({
-        data: {
-            email: "asd",
-            name: "adsads"
-        }
-    })
+  try {
+    await db.user.create({
+      data: {
+        email: "asd" + Math.random(),
+        name: "adsads",
+        number: "+911234567890",
+        password: "123445566",
+      },
+    });
+
     return NextResponse.json({
-        message: "hi there"
-    })
-}
+      message: "hi there",
+    });
+  } catch (e) {
+    return NextResponse.json({ message: "Error" }, { status: 500 });
+  }
+};
