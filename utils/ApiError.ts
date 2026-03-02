@@ -8,7 +8,7 @@ class ApiError extends Error {
     statusCode: number,
     message: string = "Something went wrong",
     errors: string[] = [],
-    stack: string = ""
+    stack: string = "",
   ) {
     super(message); // Call the parent class constructor
     this.statusCode = statusCode;

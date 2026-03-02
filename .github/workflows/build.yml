@@ -16,11 +16,14 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Dependencies
-        run: npm install
-
       - name: Generate Prisma Client
         run: npm run db:generate
 
+      - name: Install Dependencies
+        run: npm install
+
       - name: Run Build
+        env:
+          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
+          NEXTAUTH_SECRET: "secret"
         run: npm run build
