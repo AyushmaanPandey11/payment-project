@@ -4,6 +4,7 @@ import db from "@repo/db/client";
 export const dynamic = "force-dynamic";
 
 export const GET = async () => {
+  console.log("testing cicid");
   try {
     await db.user.create({
       data: {
