@@ -23,4 +23,7 @@ jobs:
         run: npm run db:generate
 
       - name: Run Build
+        env:
+          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
+          NEXTAUTH_SECRET: "secret"
         run: npm run build
